@@ -4,6 +4,7 @@ Advent of code day 2
 
 Input requires opponents choice, and instruction for the player.
 Instruction can be rock-paper-scissor, or lose-draw-win
+Different scores are obtained with the 2 interpretations
 """
 
 
@@ -42,6 +43,7 @@ def determine_my_action(choice_opponent, outcome):
 
 
 def main():
+    # Convert input letters into input numbers
     choice_dict = {k: int(v) for k, v in zip("ABCXYZ", "123123")}
 
     with open("input.txt") as file:
