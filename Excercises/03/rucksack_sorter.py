@@ -1,4 +1,5 @@
 def find_wrong_item(rucksack: str):
+    """Returns item common to first and second half of rucksack"""
     size = len(rucksack) // 2
     part_1 = set(rucksack[:size])
     part_2 = set(rucksack[size:])
@@ -7,7 +8,7 @@ def find_wrong_item(rucksack: str):
 
 
 def find_item_in_both_compartments(priorities: dict):
-
+    """Sums priority of all the common items."""
     total_priorities = 0
     with open("input.txt") as file:
         for line in file:
@@ -18,6 +19,9 @@ def find_item_in_both_compartments(priorities: dict):
 
 
 def find_item_in_3_rucksacks(priorities: dict):
+    """
+    Compares 3 rucksacks to find the common item
+    """
     with open("input.txt") as file:
         total_badge_num = 0
         while True:
@@ -25,6 +29,7 @@ def find_item_in_3_rucksacks(priorities: dict):
             rucksack_2 = set(file.readline().strip())
             rucksack_3 = set(file.readline().strip())
             badge = rucksack_1 & rucksack_2 & rucksack_3
+            # empty set -> end of file
             if len(badge) == 0:
                 break
             badge_num = priorities[badge.pop()]
