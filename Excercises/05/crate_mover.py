@@ -1,3 +1,9 @@
+"""
+Moves crates and returns the letters of the top crates in each stack
+
+Advent of code day 05
+"""
+
 import copy
 
 
@@ -6,15 +12,16 @@ def parse_input(file):
     crates = []
     moves = []
     for line in file:
-        if crates_done:
+        if crates_done: # Reading moves
             split_line = line.split()
             amount = int(split_line[1])
             origin = int(split_line[3]) - 1
             destination = int(split_line[5]) - 1
             moves.append((amount, origin, destination))
 
-        elif line == "\n":
+        elif line == "\n": # End of crate section
             crates_done = True
+            # Transpose crates
             new_crates = [[] for _ in range(len(crates[0]))]
             for row_of_crates in crates[::-1]:
                 for ix, crate in enumerate(row_of_crates):
@@ -22,7 +29,7 @@ def parse_input(file):
                         continue
                     new_crates[ix].append(crate)
 
-        elif line.startswith("["):
+        elif line.startswith("["): # Part of crate section
             num_crates = (len(line) + 1) // 4
             row_of_crates = []
             for ix in range(num_crates):
@@ -42,7 +49,6 @@ def move_crates_single(crates, moves):
 
 
 def move_crates_multi(crates, moves):
-    # print(crates)
     for move in moves:
         # move crates simultaniously, keeping order
         crates[move[2]].extend(crates[move[1]][-move[0]:])
@@ -54,8 +60,6 @@ def grab_letters(crates):
     """grab letters of all top crates"""
     letters = []
     for stack_of_crates in crates:
-        if not stack_of_crates:
-            print("stack of crates is empty")
         letters.append(stack_of_crates[-1])
     print("".join(letters))
 
