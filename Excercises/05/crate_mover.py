@@ -1,3 +1,6 @@
+import copy
+
+
 def parse_input(file):
     crates_done = False
     crates = []
@@ -29,22 +32,42 @@ def parse_input(file):
     return new_crates, moves
 
 
-def move_crates(crates, moves):
+def move_crates_single(crates, moves):
     for move in moves:
+        # move crates from top of 1 stack to back of other stack one by one
+        # thus reversing order
         for _ in range(move[0]):
             crates[move[2]].append(crates[move[1]].pop())
     return crates
 
 
+def move_crates_multi(crates, moves):
+    # print(crates)
+    for move in moves:
+        # move crates simultaniously, keeping order
+        crates[move[2]].extend(crates[move[1]][-move[0]:])
+        del crates[move[1]][-move[0]:]
+    return crates
+
+
+def grab_letters(crates):
+    """grab letters of all top crates"""
+    letters = []
+    for stack_of_crates in crates:
+        if not stack_of_crates:
+            print("stack of crates is empty")
+        letters.append(stack_of_crates[-1])
+    print("".join(letters))
+
+
 def main():
     with open("input.txt") as file:
         crates, moves = parse_input(file)
-        moved_crates = move_crates(crates, moves)
-        # grab letters of all top crates
-        letters = []
-        for stack_of_crates in moved_crates:
-            letters.append(stack_of_crates.pop())
-        print("".join(letters))
+        crates_1 = copy.deepcopy(crates)
+    moved_crates_single = move_crates_single(crates, moves)
+    moved_crates_multi = move_crates_multi(crates_1, moves)
+    grab_letters(moved_crates_single)
+    grab_letters(moved_crates_multi)
 
 
 if __name__ == "__main__":
