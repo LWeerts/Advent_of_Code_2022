@@ -12,14 +12,14 @@ def parse_input(file):
     crates = []
     moves = []
     for line in file:
-        if crates_done: # Reading moves
+        if crates_done:  # Reading moves
             split_line = line.split()
             amount = int(split_line[1])
             origin = int(split_line[3]) - 1
             destination = int(split_line[5]) - 1
             moves.append((amount, origin, destination))
 
-        elif line == "\n": # End of crate section
+        elif line == "\n":  # End of crate section
             crates_done = True
             # Transpose crates
             new_crates = [[] for _ in range(len(crates[0]))]
