@@ -29,7 +29,7 @@ def parse_input(file):
                         continue
                     new_crates[ix].append(crate)
 
-        elif line.startswith("["): # Part of crate section
+        elif line.startswith("["):  # Part of crate section
             num_crates = (len(line) + 1) // 4
             row_of_crates = []
             for ix in range(num_crates):
