@@ -16,7 +16,7 @@ def main():
             elif line.startswith("dir"):
                 current_dir[line.split[-1]] = {}
             else: 
-                pass
+                current_dir[line.split[-1]] = int(line.split[0])
 
 # bla 
 if __name__ == "__main__":
