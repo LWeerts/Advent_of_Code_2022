@@ -61,6 +61,5 @@ def main():
     print(min(big_folder_list))
 
 
-
 if __name__ == "__main__":
     main()
