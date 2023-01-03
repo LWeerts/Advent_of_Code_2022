@@ -41,28 +41,28 @@ class Tail(Movable):
         delta_y = target.pos()[1] - self.pos()[1]
 
         instruction = ""
-        if delta_x > 1:
+        if delta_x == 2:
             instruction += "R"
-        elif delta_x < -1:
+        elif delta_x == -2:
             instruction += "L"
-        if delta_y > 1:
+        if delta_y == 2:
             instruction += "U"
-        elif delta_y < -1:
+        elif delta_y == -2:
             instruction += "D"
         if instruction:
             self.move_count += 1
         # If we move, prefer to move diagonally
-        if instruction in "RL":
-            if delta_y > 0:
+        if instruction and instruction in "RL":
+            if delta_y == 1:
                 instruction += "U"
-            elif delta_y < 0:
+            elif delta_y == -1:
                 instruction += "D"
         if instruction in "UD":
-            if delta_x > 0:
+            if delta_x == 1:
                 instruction += "R"
-            elif delta_x < 0:
+            elif delta_x == -1:
                 instruction += "L"
-        # print(delta_x, delta_y, instruction)
+        print(delta_x, delta_y, instruction)
         self.move(instruction)
         self.visited_pos.add(self.pos())
         # self.visited_pos.append(self.pos())
@@ -83,6 +83,7 @@ def main():
             for _ in range(amount):
                 front.move(direction)
                 back.follow_Head(front)
+                print(front.pos(), back.pos())
                 # print(back.pos())
     print(back.count_visited_pos())
     # print(back.move_count)
