@@ -31,6 +31,9 @@ class Tail(Movable):
         super().__init__()
         self.visited_pos = set()
         self.visited_pos.add((0, 0))
+        # self.visited_pos = []
+        # self.visited_pos.append((0, 0))
+        print(self.visited_pos)
         self.move_count = 0
 
     def follow_Head(self, target: Head) -> None:
@@ -62,6 +65,7 @@ class Tail(Movable):
         # print(delta_x, delta_y, instruction)
         self.move(instruction)
         self.visited_pos.add(self.pos())
+        # self.visited_pos.append(self.pos())
 
     def count_visited_pos(self):
         return len(self.visited_pos)
