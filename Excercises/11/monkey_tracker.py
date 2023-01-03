@@ -29,7 +29,8 @@ class Monkey():
             return input_1 * input_2
 
     def div_and_round(self, num: int) -> int:
-        return num // 3
+        return num % 9699690
+        # return num
 
     def my_turn(self):
         for item in self.throwables:
@@ -59,11 +60,13 @@ def main():
                 ))
         for monkey in monkey_list:
             monkey.aquire_targets(monkey_list)
-    for _ in range(20):
+    for turn in range(10000):
+
+        print(turn)
         for monkey in monkey_list:
             monkey.my_turn()
-        for ix, monkey in enumerate(monkey_list):
-            print(f"Monkey {ix}: {monkey.throwables}")
+        # for ix, monkey in enumerate(monkey_list):
+            # print(f"Monkey {ix}: {monkey.throwables}")
     inspected_list = []
     for monkey in monkey_list:
         inspected_list.append(monkey.num_inspected)
