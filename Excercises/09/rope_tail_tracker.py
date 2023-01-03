@@ -57,7 +57,7 @@ class Tail(Movable):
                 instruction += "U"
             elif delta_y == -1:
                 instruction += "D"
-        if instruction in "UD":
+        if instruction and instruction in "UD":
             if delta_x == 1:
                 instruction += "R"
             elif delta_x == -1:
