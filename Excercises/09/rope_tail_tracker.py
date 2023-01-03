@@ -31,12 +31,10 @@ class Tail(Movable):
         super().__init__()
         self.visited_pos = set()
         self.visited_pos.add((0, 0))
-        # self.visited_pos = []
-        # self.visited_pos.append((0, 0))
-        print(self.visited_pos)
         self.move_count = 0
 
     def follow_Head(self, target: Head) -> None:
+        """Determines if and which step needs to be taken"""
         delta_x = target.pos()[0] - self.pos()[0]
         delta_y = target.pos()[1] - self.pos()[1]
 
@@ -49,9 +47,8 @@ class Tail(Movable):
             instruction += "U"
         elif delta_y == -2:
             instruction += "D"
-        if instruction:
-            self.move_count += 1
         # If we move, prefer to move diagonally
+        # instruction must not be empty
         if instruction and instruction in "RL":
             if delta_y == 1:
                 instruction += "U"
@@ -62,16 +59,15 @@ class Tail(Movable):
                 instruction += "R"
             elif delta_x == -1:
                 instruction += "L"
-        print(delta_x, delta_y, instruction)
         self.move(instruction)
         self.visited_pos.add(self.pos())
-        # self.visited_pos.append(self.pos())
 
     def count_visited_pos(self):
         return len(self.visited_pos)
 
 
-def main():
+def main_part_1():
+    """Rope of length 2"""
     front = Head()
     back = Tail()
     with open("Excercises/09/input.txt") as file:
@@ -83,11 +79,33 @@ def main():
             for _ in range(amount):
                 front.move(direction)
                 back.follow_Head(front)
-                print(front.pos(), back.pos())
-                # print(back.pos())
     print(back.count_visited_pos())
-    # print(back.move_count)
-    # print(back.visited_pos)
+
+
+def main_part_2():
+    """Rope of lenght 10"""
+    rope = []
+    rope.append(Head())
+    for _ in range(9):
+        rope.append(Tail())
+    with open("Excercises/09/input.txt") as file:
+        for line in file:
+            if line == "":
+                continue
+            direction, amount = line.split()
+            amount = int(amount)
+            for _ in range(amount):
+                rope[0].move(direction)  # Move the head
+                for ix in range(9):
+                    # Move each tail sequentially
+                    rope[ix + 1].follow_Head(rope[ix])
+    # Answer is positions visited by the rear of the rope
+    print(rope[-1].count_visited_pos())
+
+
+def main():
+    main_part_1()
+    main_part_2()
 
 
 if __name__ == "__main__":
