@@ -14,12 +14,18 @@ class Hero():
         self.pathlength = 0
 
     def alt(self, pos_x, pos_y):
+        """For getting the altitude at the target location"""
         return self.chart[pos_x, pos_y]
 
     def check_finished(self):
+        """Check if the finish is visited, thus we are done"""
         return self.visited[self.finish_x, self.finish_y] != -1
 
     def identify_moves(self, pos_x, pos_y):
+        """
+            Check all 4 directions for if moving is possible
+            and adds them to the visited chart.
+        """
         for direction in ((1, 0), (-1, 0), (0, 1), (0, -1)):
             new_x = pos_x + direction[0]
             new_y = pos_y + direction[1]
@@ -36,6 +42,7 @@ class Hero():
 
 
 class ShortestPathFinder(Hero):
+    """Modified Hero to allow any starting location"""
     def __init__(self, chart, letter_chart, pos_x, pos_y) -> None:
         self.chart = chart
         self.letter_chart = letter_chart
@@ -47,6 +54,12 @@ class ShortestPathFinder(Hero):
 
 
 def chart_reader():
+    """
+    Func to parse and convert the map.
+
+    returns chart (with numbers for altitude)
+            and letter_chart (for finding start and end location)
+    """
     letter_chart = np.genfromtxt("Excercises/12/input.txt",
                                  delimiter=1, dtype="U1")
     alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -62,6 +75,7 @@ def main_part_1():
     chart, letter_chart = chart_reader()
     explorer = Hero(chart, letter_chart)
     while not explorer.check_finished():
+        # Grab all locations we found in the previous iterartion
         coords = np.nonzero(explorer.visited == explorer.pathlength)
         for px, py in zip(coords[0], coords[1]):
             explorer.identify_moves(px, py)
@@ -70,7 +84,31 @@ def main_part_1():
 
 
 def main_part_2():
-    pass
+    chart, letter_chart = chart_reader()
+    # Find all starting locations to loop through
+    starting_locs = np.nonzero(chart == 0)
+    shortest_path_length = 9999999999999999
+    paths_explored = 0
+
+    for start_x, start_y in zip(starting_locs[0], starting_locs[1]):
+        print(f"paths_explored {paths_explored}")  # To see progress
+        scout = ShortestPathFinder(chart, letter_chart, start_x, start_y)
+        while not scout.check_finished():
+            coords = np.nonzero(scout.visited == scout.pathlength)
+            if len(coords[0]) == 0:  # Stuck with no path to the finish
+                paths_explored += 1
+                del scout
+                break
+            for px, py in zip(coords[0], coords[1]):
+                scout.identify_moves(px, py)
+            scout.pathlength += 1
+
+        else:  # Only execute if finish is reached
+            paths_explored += 1
+            if scout.pathlength < shortest_path_length:
+                shortest_path_length = scout.pathlength
+            del scout
+    print(f"shortest path length {shortest_path_length}")
 
 
 def main():
