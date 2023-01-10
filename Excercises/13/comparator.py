@@ -2,8 +2,14 @@
 
 class Comparator():
     def __init__(self, inp_1, inp_2) -> None:
-        self.inp_1 = self.parse_input(inp_1)
-        self.inp_2 = self.parse_input(inp_2)
+        if type(inp_1) == str:
+            self.inp_1 = self.parse_input(inp_1)
+        else:
+            self.inp_1 = inp_1
+        if type(inp_2) == str:
+            self.inp_2 = self.parse_input(inp_2)
+        else:
+            self.inp_2 = inp_2
 
     def parse_input(self, inp):
         output = []
@@ -68,9 +74,10 @@ class Comparator():
                 ix += 1
 
 
-def main():
+def main_part_1():
     with open("Excercises/13/input.txt") as file:
         ix_sum = 0
+        all_inputs = []
         for ix in range(1, 151):
             pass
             inp_1 = file.readline().strip()
@@ -84,8 +91,42 @@ def main():
                 ix_sum += ix
             elif result == "E":
                 print(f"A pair is identical, at index {ix}")
+            all_inputs.append(pair_comparator.inp_1)
+            all_inputs.append(pair_comparator.inp_2)
 
-        print(f"The sum of indexes is {ix_sum}")
+    print(f"The sum of indexes is {ix_sum}")
+    return all_inputs
+
+
+def main_part_2(all_inputs):
+    all_inputs.append([[2]])
+    all_inputs.append([[6]])
+    sorted_output = []
+    for inp in all_inputs:
+        low_bound = 0
+        high_bound = len(sorted_output)
+        while low_bound != high_bound:
+            target = (low_bound + high_bound) // 2
+            comp = Comparator(inp, sorted_output[target])
+            left_right = comp.compare(comp.inp_1, comp.inp_2)
+            if left_right == "L":
+                high_bound = target
+            elif left_right == "R":
+                low_bound = target + 1
+            else:
+                print(f"Comparison failed at input {inp}")
+                quit()
+        else:
+            sorted_output.insert(low_bound, inp)
+    packet_1 = sorted_output.index([[2]]) + 1
+    packet_2 = sorted_output.index([[6]]) + 1
+    decoder_key = packet_1 * packet_2
+    print(decoder_key)
+
+
+def main():
+    all_inputs = main_part_1()
+    main_part_2(all_inputs)
 
 
 if __name__ == "__main__":
