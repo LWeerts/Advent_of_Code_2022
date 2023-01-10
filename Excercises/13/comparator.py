@@ -1,6 +1,8 @@
+"""A comparison and sorting algorithm"""
 
 
 class Comparator():
+    """Compares 2 lists of integers"""
     def __init__(self, inp_1, inp_2) -> None:
         if type(inp_1) == str:
             self.inp_1 = self.parse_input(inp_1)
@@ -12,6 +14,7 @@ class Comparator():
             self.inp_2 = inp_2
 
     def parse_input(self, inp):
+        """Convert input string into nested list structure"""
         output = []
         current_list = output
         parent_list = []
@@ -38,8 +41,16 @@ class Comparator():
         return output
 
     def compare(self, inp_1, inp_2):
+        """Compares nested lists of ints.
+
+        input: 2 lists
+
+        output: 'L', 'R', 'E' (indicates the smaller input, or equal)
+        """
+
         ix = 0
         while True:
+            # Catch one or both lists running out of items
             try:
                 item_1, item_2 = inp_1[ix], inp_2[ix]
             except IndexError:
@@ -50,9 +61,11 @@ class Comparator():
                 else:
                     return "E"
 
+            # Recursively comparing inner lists
             if type(item_1) == list and type(item_2) == list:
                 list_compare = self.compare(item_1, item_2)
 
+            # Comparing integers, if equal, go to next item
             elif type(item_1) == int and type(item_2) == int:
                 if item_1 < item_2:
                     return "L"
@@ -62,12 +75,14 @@ class Comparator():
                     ix += 1
                     continue
 
+            # Mixed type comparison -> integer gets encapsulating list
             elif type(item_1) == int and type(item_2) == list:
                 list_compare = self.compare([item_1], item_2)
 
             elif type(item_1) == list and type(item_2) == int:
                 list_compare = self.compare(item_1, [item_2])
 
+            # Use result of recursive comparison
             if list_compare in "RL":
                 return list_compare
             elif list_compare == "E":
@@ -75,6 +90,7 @@ class Comparator():
 
 
 def main_part_1():
+    """Does part 1 of the excercise, and stores input for part 2"""
     with open("Excercises/13/input.txt") as file:
         ix_sum = 0
         all_inputs = []
@@ -99,16 +115,22 @@ def main_part_1():
 
 
 def main_part_2(all_inputs):
+    """Part 2, implements a quick-insertion sort"""
     all_inputs.append([[2]])
     all_inputs.append([[6]])
     sorted_output = []
+    comparion_tracker = []
     for inp in all_inputs:
         low_bound = 0
         high_bound = len(sorted_output)
+        num_comparisons = 0
         while low_bound != high_bound:
+            # Find middle of the current range
             target = (low_bound + high_bound) // 2
             comp = Comparator(inp, sorted_output[target])
             left_right = comp.compare(comp.inp_1, comp.inp_2)
+            num_comparisons += 1
+            # Adjust the range
             if left_right == "L":
                 high_bound = target
             elif left_right == "R":
@@ -118,10 +140,14 @@ def main_part_2(all_inputs):
                 quit()
         else:
             sorted_output.insert(low_bound, inp)
+            comparion_tracker.append(num_comparisons)
+
     packet_1 = sorted_output.index([[2]]) + 1
     packet_2 = sorted_output.index([[6]]) + 1
     decoder_key = packet_1 * packet_2
-    print(decoder_key)
+    print(f"decoder key {decoder_key}")
+    ratio = sum(comparion_tracker) / len(comparion_tracker)
+    print(f"average comparisons needed per item {ratio}")
 
 
 def main():
