@@ -1,41 +1,82 @@
+"""Advent of code excercise 12.
+
+This module is my solution to the 12th problem of the Advent of Code
+2022. The problem can be found at https://adventofcode.com/2022/day/12.
+
+Excercise summary:
+    The excercise requires pathfinding over a 41 by 78 grid (row,
+    column). The grid has altitude indicated by lowercase letters, with
+    start and end indicated with capital S and E.
+
+To Do:
+    * super.__init__ for ShortestPathFinder
+    * Internalize Hero attributes
+    * Write docstrings (https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
+    * Check all docstrings
+    * del scout
+    * input_test.txt -> certain output
+    * more comments???
+    * replace numpy.nonzero with the per-item grouped one
+    * restructure to sourcefiles and datafiles
+    * add __init__.py and a main executable that calls other scripts
+    * check pep8 compliance
+    * requirements.txt
+    * pathlib
+
+
+
+Author: Luc Weerts
+Date: Jan 7, 2023
+"""
+
+
 import numpy as np
 
 
 class Hero():
-    """Can move on the map"""
+    """Can move on the map.
+    
+    Attributes:
+        chart (numpy.ndarray): heightmap, navigated by the Hero.
+        visited (numpy.ndarray): each int represents how far away from
+            the start this location is. Unmapped = -1
+        pathlength (int): pathlength to farthest explored tile
+    """
 
     def __init__(self, chart, letter_chart) -> None:
-        self.chart = chart
-        self.letter_chart = letter_chart
-        self.visited = np.zeros(self.chart.shape, dtype=np.int32) - 1
-        self.pos_x, self.pos_y = np.nonzero(self.letter_chart == "S")
-        self.visited[self.pos_x, self.pos_y] = 0  # Start location
-        self.finish_x, self.finish_y = np.nonzero(self.letter_chart == "E")
+        self.__chart = chart
+        self.__letter_chart = letter_chart
+        self.visited = np.zeros(self.__chart.shape, dtype=np.int32) - 1
+        self.__pos_x, self.__pos_y = np.nonzero(self.__letter_chart == "S")
+        self.visited[self.__pos_x, self.__pos_y] = 0  # Start location
+        self.__finish_x, self.__finish_y = np.nonzero(self.__letter_chart == "E")
         self.pathlength = 0
 
     def alt(self, pos_x, pos_y):
         """For getting the altitude at the target location"""
-        return self.chart[pos_x, pos_y]
+        return self.__chart[pos_x, pos_y]
 
     def check_finished(self):
         """Check if the finish is visited, thus we are done"""
-        return self.visited[self.finish_x, self.finish_y] != -1
+        return self.visited[self.__finish_x, self.__finish_y] != -1
 
     def identify_moves(self, pos_x, pos_y):
         """
-            Check all 4 directions for if moving is possible
-            and adds them to the visited chart.
+        Check all 4 directions for if moving is possible
+        and adds them to the visited chart.
         """
         for direction in ((1, 0), (-1, 0), (0, 1), (0, -1)):
             new_x = pos_x + direction[0]
             new_y = pos_y + direction[1]
-            # Don't want to check -1 coordinate, it is other side of map
+            # Don't want to check negative coordinate, it is other side of map
             if new_x < 0 or new_y < 0:
                 continue
             try:
-                if (self.visited[new_x, new_y] == -1
-                        and self.alt(pos_x, pos_y) + 1
-                        >= self.chart[new_x, new_y]):
+                if (
+                    self.visited[new_x, new_y] == -1
+                    and
+                    self.alt(pos_x, pos_y) + 1 >= self.__chart[new_x, new_y]
+                ):
                     self.visited[new_x, new_y] = self.pathlength + 1
             except IndexError:
                 continue
@@ -44,18 +85,14 @@ class Hero():
 class ShortestPathFinder(Hero):
     """Modified Hero to allow any starting location"""
     def __init__(self, chart, letter_chart, pos_x, pos_y) -> None:
-        self.chart = chart
-        self.letter_chart = letter_chart
-        self.visited = np.zeros(self.chart.shape, dtype=np.int32) - 1
-        self.pos_x, self.pos_y = pos_x, pos_y
-        self.visited[self.pos_x, self.pos_y] = 0  # Start location
-        self.finish_x, self.finish_y = np.nonzero(self.letter_chart == "E")
-        self.pathlength = 0
+        super().__init__(chart, letter_chart)
+        self.__pos_x, self.__pos_y = pos_x, pos_y
+        self.visited[self.__pos_x, self.__pos_y] = 0  # Start location
 
 
 def chart_reader():
     """
-    Func to parse and convert the map.
+    Parses and converts the map.
 
     returns chart (with numbers for altitude)
             and letter_chart (for finding start and end location)
