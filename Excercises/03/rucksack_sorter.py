@@ -10,7 +10,7 @@ def find_wrong_item(rucksack: str):
 def find_item_in_both_compartments(priorities: dict):
     """Sums priority of all the common items."""
     total_priorities = 0
-    with open("input.txt") as file:
+    with open("Excercises/03/input.txt") as file:
         for line in file:
             wrong_item = find_wrong_item(line.strip()).pop()
             item_num = priorities[wrong_item]
@@ -22,7 +22,7 @@ def find_item_in_3_rucksacks(priorities: dict):
     """
     Compares 3 rucksacks to find the common item
     """
-    with open("input.txt") as file:
+    with open("Excercises/03/input.txt") as file:
         total_badge_num = 0
         while True:
             rucksack_1 = set(file.readline().strip())

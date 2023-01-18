@@ -7,7 +7,7 @@ blank line indicates end of one elf, beginning of next
 
 
 def main():
-    with open("input.txt") as file:
+    with open("Excercises/01/input.txt") as file:
         calories = 0  # current counter
         calorie_list = []  # keeps track of all totals
         for line in file:

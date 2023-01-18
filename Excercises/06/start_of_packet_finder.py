@@ -1,7 +1,7 @@
 
 
 def main():
-    with open("input.txt") as file:
+    with open("Excercises/06/input.txt") as file:
         datastream = file.readline()
     for ix in range(0, len(datastream) - 3):
         bit = datastream[ix: ix + 14]

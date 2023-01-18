@@ -65,7 +65,7 @@ def grab_letters(crates):
 
 
 def main():
-    with open("input.txt") as file:
+    with open("Excercises/05/input.txt") as file:
         crates, moves = parse_input(file)
         crates_1 = copy.deepcopy(crates)
     moved_crates_single = move_crates_single(crates, moves)

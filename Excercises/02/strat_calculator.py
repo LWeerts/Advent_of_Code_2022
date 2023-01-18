@@ -46,7 +46,7 @@ def main():
     # Convert input letters into input numbers
     choice_dict = {k: int(v) for k, v in zip("ABCXYZ", "123123")}
 
-    with open("input.txt") as file:
+    with open("Excercises/02/input.txt") as file:
         score_total_1 = score_total_2 = 0
         for line in file:
             choice_opponent = choice_dict[line.split()[0]]

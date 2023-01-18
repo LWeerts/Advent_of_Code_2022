@@ -4,7 +4,7 @@
 def main():
     count_containing = 0
     count_overlap = 0
-    with open("input.txt") as file:
+    with open("Excercises/04/input.txt") as file:
         for line in file:
             part_1, part_2 = line.split(",")
             start_1, end_1 = part_1.split("-")
