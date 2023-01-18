@@ -21,11 +21,8 @@ Exercise summary:
     single position that is not in sensor range.
 
 To Do
-    * Clean up main() (segment to more functions)
     * Main executable handles input.txt?
     * input.txt vs Excercises/xx/input.txt
-    * Convert different strats of part 2 to separate functions
-    * pref_block -> pref_block
 
 Author: Luc Weerts
 Date: Jan 7, 2023
