@@ -6,7 +6,7 @@ To Do
     * Main executable handles input.txt?
     * input.txt vs Excercises/xx/input.txt
     * Convert different strats of part 2 to separate functions
-    * loc -> pref_block
+    * pref_block -> pref_block
 """
 
 
@@ -14,7 +14,22 @@ import numpy as np
 
 
 class Sensor():
-    def __init__(self, coord_x, coord_y, beacon_x, beacon_y) -> None:
+    """Stores own and beacon location, can calculate blockage on line.
+
+    Args:
+        coord_x (int): Own x coordinate.
+        coord_y (int): Own y coordinate.
+        beacon_x (int): Beacon x coordinate.
+        beacon_y (int): Beacon y coordinate.
+
+    Attributes:
+        coord_x (int): Own x coordinate.
+        coord_y (int): Own y coordinate.
+        beacon_x (int): Beacon x coordinate.
+        beacon_y (int): Beacon y coordinate.
+        man_dist (int): Manhattan distance between sensor and beacon.
+    """
+    def __init__(self, coord_x, coord_y, beacon_x, beacon_y):
         self.coord_x = coord_x
         self.coord_y = coord_y
         self.beacon_x = beacon_x
@@ -24,12 +39,12 @@ class Sensor():
     def block_on_line(self, line):
         """Returns range of blockage on target line.
 
-        input:
-        line = int
+        Args:
+        line (int): Target line to check.
 
-        output:
-        None (if this sensor does not block the target line
-        [start, end] (if blocking the line, end is inclusive)
+        Returns:
+            None: If sensor does not block target line.
+            list: [start, end] otherwise (end is exclusive).
         """
         delta_y = abs(self.coord_y - line)
         surplus = self.man_dist - delta_y
@@ -39,14 +54,32 @@ class Sensor():
 
 
 def manhattan_dist(x1, y1, x2, y2):
-    """Return the Manhattan distance between 2 points"""
+    """Calculates the Manhattan distance between 2 points
+
+    Args:
+        x1 (int): x coordinate of point 1.
+        y1 (int): y coordinate of point 1.
+        x2 (int): x coordinate of point 2.
+        y2 (int): y coordinate of point 2.
+
+    Returns:
+        int: Manhattan distance.
+    """
     return abs(x1 - x2) + abs(y1 - y2)
 
 
-def parse_input():
-    """Reads input, returns sensor list sorted by x coordinate"""
+def parse_input(input_file):
+    """Reads input, returns sensor list sorted by x coordinate.
+
+    Args:
+        input_file (str): Location of input file, relative to working
+            dir.
+
+    Returns:
+        list: Contains Sensor objects, sorted by Sensor x coordinate.
+    """
     sensor_list = []
-    with open("Excercises/15/input.txt") as file:
+    with open(input_file) as file:
         for line in file:
             split_line = line.split()
             coord_x = int(split_line[2].strip("xy=,:"))
@@ -54,12 +87,23 @@ def parse_input():
             beacon_x = int(split_line[8].strip("xy=,:"))
             beacon_y = int(split_line[9].strip("xy=,:"))
             sensor_list.append(Sensor(coord_x, coord_y, beacon_x, beacon_y))
+
     sensor_list.sort(key=lambda sensor: sensor.coord_x)
     return sensor_list
 
 
 def find_all_blocked_on_line(sensor_list, line):
-    # Part 1
+    """Finds the number of blocked locations on a line.
+
+    Uses a set to contain ints representing x coordinates. Ranges of
+    ints are added to the set for each sensor. Beacon locations must
+    be removed as they are not blocked, but occupied.
+
+    Args:
+        sensor_list (list): Contains Sensor objects, sorted by
+            Sensor x coordinate.
+    """
+
     blocked_locations = set()
     for sensor in sensor_list:
         block = sensor.block_on_line(line)
@@ -67,20 +111,26 @@ def find_all_blocked_on_line(sensor_list, line):
             continue
         # Fill set with integers for all blocked x coordinates
         blocked_locations.update(range(*block))
+
     for sensor in sensor_list:
         if sensor.beacon_y == line:
             # Remove beacons themselves
             blocked_locations.discard(sensor.beacon_x)
+
     print(len(blocked_locations))
 
 
 def find_non_blocked_1(sensor_list):
     """Find possible beacon location, very slowly.
-    
+
     Adds ranges of integers to a set. If set is shorter than 4_000_000,
     then there is a possible beacon location.
     This implementation is very slow, ~ 10 lines/s, so this is not
-    actually used.
+    actually used. It has to store 4 million ints during each iteration.
+
+    Args:
+        sensor_list (list): Contains Sensor objects, sorted by
+            Sensor x coordinate.
     """
 
     blocked_locations = set()
@@ -91,7 +141,7 @@ def find_non_blocked_1(sensor_list):
         for sensor in sensor_list:
             blocked_locations.update(range(*sensor.block_on_line(line)))
         if len(blocked_locations) < 4_000_000:
-            coord_x = blocked_locations.difference(range(0, 4_000_001))
+            coord_x = blocked_locations.difference(range_x)
             print(f"found possible beacon location at {coord_x}, {line}")
 
 
@@ -100,15 +150,19 @@ def find_non_blocked_2(sensor_list):
 
     Uses a numpy array to keep track of which positions are blocked.
     True = blocked, False = open
-    Slow, ~ 200 lines/s. Stores 4 million bools instead of ints
-    """
+    Slow, ~ 200 lines/s. Stores 4 million bools instead of ints.
 
+    Args:
+        sensor_list (list): Contains Sensor objects, sorted by
+            Sensor x coordinate.
+    """
 
     blocked_locations = np.zeros(4_000_001, dtype=bool)
     for line in range(0, 4_000_001):
         if line % 1000 == 0:
             print(line)
         blocked_locations[:] = False  # Reset array
+
         for ix, sensor in enumerate(sensor_list):
             block = sensor.block_on_line(line)
             if block is None:
@@ -119,16 +173,50 @@ def find_non_blocked_2(sensor_list):
             if block[1] > 4_000_001:
                 block[1] = 4_000_001
             blocked_locations[block[0]: block[1]] = True
+
         if np.any(blocked_locations == False):
             print(np.nonzero(blocked_locations == False)[0], line)
 
 
+def merge_blocks(block, blocked_locations):
+    """Fuses start and stop of block with blocks in blocked_locations.
+
+    Args:
+        block (list): Start and stop of the current sensor block range.
+        blocked_locations (list): Contains blocks of start and stop from
+            the previous sensors.
+
+    Returns:
+        list: blocked_locations with overlapping ranges merged.
+    """
+    new_blocked_locations = []
+    for pref_block in blocked_locations:
+        if (
+            pref_block[0] <= block[0] <= pref_block[1]
+            or block[0] <= pref_block[0] <= block[1]
+        ):
+            # block and pref_block overlap, so fuse together
+            block = [
+                min(pref_block[0], block[0]),
+                max(pref_block[1], block[1])
+            ]
+        else:
+            # Store pref_block for next sensor
+            new_blocked_locations.append(pref_block)
+    new_blocked_locations.append(block)
+    return new_blocked_locations
+
+
 def find_non_blocked_3(sensor_list):
     """Find possible beacon location, quickly.
-    
+
     Keeps track of start and end of blocked ranges.
     Merges new blocked range with old range if they overlap.
     Much faster than the other implementations, over 100_000 lines/s.
+
+    Args:
+        sensor_list (list): Contains Sensor objects, sorted by
+            Sensor x coordinate.
     """
 
     for line in range(0, 4_000_001):
@@ -144,25 +232,17 @@ def find_non_blocked_3(sensor_list):
                 continue
 
             # Merge block with previous blocks
-            new_blocked_locations = []
-            for loc in blocked_locations:
-                if (loc[0] <= block[0] <= loc[1]
-                        or block[0] <= loc[0] <= block[1]):
-                    # block and loc overlap, so fuse together
-                    block = [min(loc[0], block[0]), max(loc[1], block[1])]
-                else:
-                    # Store loc for next sensor
-                    new_blocked_locations.append(loc)
-            new_blocked_locations.append(block)
-            blocked_locations = new_blocked_locations[:]  # Copy!
+            blocked_locations = merge_blocks(block, blocked_locations)
         if len(blocked_locations) != 1:
             print(blocked_locations[0][1] * 4000000 + line)
 
 
 def main():
-    sensor_list = parse_input()
-    line = 2000000
+    input_file = "Excercises/15/input.txt"
+    sensor_list = parse_input(input_file)
+    line = 2_000_000
     find_all_blocked_on_line(sensor_list, line)
+    find_non_blocked_3(sensor_list)
 
 
 if __name__ == "__main__":
