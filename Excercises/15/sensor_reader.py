@@ -1,5 +1,24 @@
-"""
+"""Advent of code exercise 15.
 
+This module is my solution to the 15th problem of the Advent of Code
+2022. The problem can be found at https://adventofcode.com/2022/day/15.
+
+Exercise summary:
+    The exercise gives sensor locations, each having the location of
+    the nearest beacon attached. Distance is calculated as Manhattan
+    distance throughout the exercise. Since each sensor reports the
+    nearest beacon, an area around the sensor cannot contain other
+    beacons. However, the distress beacon that must be found is not
+    reported by the sensors, so the goal is to find the beacon by
+    eliminating all locations where it cannot be.
+
+    Part 1:
+    Count all positions in row y=2_000_000 that are blocked by sensor
+    range.
+
+    Part 2:
+    Consider the area 0 to 4_000_000 (inclusive) in x and y. Find the
+    single position that is not in sensor range.
 
 To Do
     * Clean up main() (segment to more functions)
@@ -7,6 +26,9 @@ To Do
     * input.txt vs Excercises/xx/input.txt
     * Convert different strats of part 2 to separate functions
     * pref_block -> pref_block
+
+Author: Luc Weerts
+Date: Jan 7, 2023
 """
 
 
