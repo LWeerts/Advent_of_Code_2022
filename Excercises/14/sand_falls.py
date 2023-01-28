@@ -1,8 +1,42 @@
+"""Advent of Code exercise 14.
+
+This module is my solution to the 14th problem of the Advent of Code
+2022. The problem can be found at https://adventofcode.com/2022/day/14.
+
+Exercise summary:
+    The input consists of coordinates of straight lines of rock. The
+    cave that the rock makes up, will be filled with blocks of sand
+    falling one by one. The sand spawns at 500, 0 and falls down, or
+    down and left, or down and right, otherwise it comes to rest.
+
+    Part 1:
+    Count how many blocks of sand come to rest before sand starts
+    falling into the abyss below the cave?
+
+    Part 2:
+    The cave now has a floor, 2 layers lower than the lowest block of
+    rock, and infinitely wide. How many blocks of sand can spawn until
+    the spawnpoint is blocked by sand?
+
+Author: Luc Weerts
+Date: Jan 13, 2023
+"""
+
+
 import numpy as np
 
 
 class PlayingField():
-    """Handles reading the scan-map"""
+    """Handles reading the scan-map
+    
+    Args:
+        part_1_2 (int): If 1, row 1000 of the cave is set to 'A' for 
+            abyss. If 2, the cave floor is generated 2 layers below the
+            lowest rock.
+    
+    Attributes:
+        
+    """
     def __init__(self, part_1_2) -> None:
         # Initialize an empty field, y coord of 200 is top down!
         self.field = np.full((200, 1000), " ", dtype="U1")

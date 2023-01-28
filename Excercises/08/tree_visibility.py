@@ -2,7 +2,8 @@ import numpy as np
 
 
 def read_forest():
-    forest = np.genfromtxt("Excercises/08/input.txt", delimiter=1, dtype="uint8")
+    forest = np.genfromtxt("Excercises/08/input.txt",
+                           delimiter=1, dtype="uint8")
     return forest
 
 
