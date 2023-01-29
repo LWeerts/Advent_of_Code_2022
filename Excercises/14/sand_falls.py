@@ -27,7 +27,7 @@ import numpy as np
 
 
 class PlayingField():
-    """Handles reading the scan-map
+    """Handles reading the scan-map.
     
     Args:
         part_1_2 (int): If 1, row 1000 of the cave is set to 'A' for 
@@ -35,6 +35,9 @@ class PlayingField():
             lowest rock.
     
     Attributes:
+        field (numpy.NDarray): 200 by 1000 array containing single
+            letters. ' ' is empty space, '#' is rock, 'A' is abyss and
+            'o' is sand. 
         
     """
     def __init__(self, part_1_2) -> None:
@@ -49,7 +52,11 @@ class PlayingField():
             self.field[self.highest_y + 2, :] = "#"
 
     def read_map(self):
-        """Reads the input, converts rock locations and populates the map"""
+        """Reads the input, converts rock locations and populates the map.
+        
+        Returns:
+            int: The highest y coordinate of rock.
+        """
         highest_y = 0
         with open("Excercises/14/input.txt") as file:
             for line in file:
@@ -70,9 +77,16 @@ class PlayingField():
 
 
 class Sand():
-    """Handles flooding of cave with sand"""
-    def __init__(self, playing_field) -> None:
-        self.field = playing_field.field
+    """Handles flooding of cave with sand.
+    
+    Args:
+        field (numpy.NDarray): Field with rock, to be filled with sand.
+    
+    Attributes:
+        field (numpy.NDarray): Field with rock, to be filled with sand.
+    """
+    def __init__(self, field) -> None:
+        self.field = field
 
     def next_move(self, coord_y, coord_x):
         """Determines next possible move and returns coordinates.
@@ -96,7 +110,11 @@ class Sand():
             return ("Rest", coord_y, coord_x)
 
     def drop_sand(self):
-        """Fills cave with sand"""
+        """Fills cave with sand.
+        
+        Modifies self.field to fill the cave with sand.
+        Calls self.next_move until sand comes to rest.
+        """
         drop_result = (0, 500)  # Spawn location
         while drop_result[0] != "End":
             drop_result = (0, 500)
@@ -118,7 +136,7 @@ class Sand():
 def main():
     field = PlayingField(2)  # Enter 1 or 2 for part 1 or 2
     # print(field.field[:12, 493:505])  # Check the input_test.txt field
-    sandfall = Sand(field)
+    sandfall = Sand(field.field)
     sandfall.drop_sand()
     print(sandfall.num_of_sand())
 
