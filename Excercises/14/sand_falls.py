@@ -28,17 +28,16 @@ import numpy as np
 
 class PlayingField():
     """Handles reading the scan-map.
-    
+
     Args:
         part_1_2 (int): If 1, row 1000 of the cave is set to 'A' for 
             abyss. If 2, the cave floor is generated 2 layers below the
             lowest rock.
-    
+
     Attributes:
         field (numpy.NDarray): 200 by 1000 array containing single
             letters. ' ' is empty space, '#' is rock, 'A' is abyss and
-            'o' is sand. 
-        
+            'o' is sand.
     """
     def __init__(self, part_1_2) -> None:
         # Initialize an empty field, y coord of 200 is top down!
@@ -53,7 +52,7 @@ class PlayingField():
 
     def read_map(self):
         """Reads the input, converts rock locations and populates the map.
-        
+
         Returns:
             int: The highest y coordinate of rock.
         """
@@ -78,10 +77,10 @@ class PlayingField():
 
 class Sand():
     """Handles flooding of cave with sand.
-    
+
     Args:
         field (numpy.NDarray): Field with rock, to be filled with sand.
-    
+
     Attributes:
         field (numpy.NDarray): Field with rock, to be filled with sand.
     """
