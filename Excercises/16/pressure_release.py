@@ -1,3 +1,6 @@
+# Attempted answers: 1777, too low
+
+
 
 class Valve():
     def __init__(self, name: str, flow: int, tunnels: list[str]) -> None:
@@ -19,7 +22,7 @@ class PlayingField():
 
     def parse_input(self) -> dict[str, Valve]:
         valve_dict = {}
-        with open("Excercises/16/input_test.txt") as file:
+        with open("Excercises/16/input.txt") as file:
             for line in file:
                 if line == "\n":
                     continue
@@ -48,7 +51,7 @@ class PlayingField():
 
         Uses a dictionary to store each node and its distance.
         All nodes in the 'outer shell' are searched for new connections
-        which are then added into the dictionary. 
+        which are then added into the dictionary.
 
         Returns:
             int: length of the path to the target
@@ -58,6 +61,7 @@ class PlayingField():
         while distance < 1000:
             if target in distance_dict:
                 break
+            to_be_added = {}
             for valve, dist in distance_dict.items():
                 if dist != distance:
                     continue
@@ -65,14 +69,22 @@ class PlayingField():
                 for tunnel in connections:
                     if tunnel in distance_dict:
                         continue
-                    distance_dict[tunnel] = distance + 1
+                    to_be_added[tunnel] = distance + 1
 
             distance += 1
+            distance_dict.update(to_be_added)
         return distance_dict[target]
 
-    def calc_score(self, target: str) -> int:
+    def calc_score(self, target: str) -> tuple[int, int]:
         # Calculate what total pressure will be released from target valve
-        pass
+        distance = self.find_path(target)
+        # 30 minutes -1 for opening the valve
+        minutes = 29 - distance - self.turn
+        if minutes <= 0:  # No time left
+            return 0, 0
+        flow = self.valve_dict[target].flow
+        score = minutes * flow
+        return score, distance
 
 
 def main():
@@ -81,6 +93,42 @@ def main():
     # print(field.valve_dict["AA"])
     # print(field.flow_list)
 
+    total_pressure_released = 0
+
+    while field.turn < 30:
+        # Grab 5 promising valves as next targets
+        high_flow_valves: list[str] = []
+        for name, _ in field.flow_list:
+            if len(high_flow_valves) == 5:
+                break
+            if field.valve_dict[name].open:
+                continue
+            high_flow_valves.append(name)
+
+        highscore = 0
+        target_name = ""
+        target_distance = 0
+        target_total_pressure = 0
+        for target in high_flow_valves:
+            total_pressure, distance = field.calc_score(target)
+            if distance != 0:
+                score = total_pressure / (distance ** 2)
+            else:
+                score = total_pressure
+            if score > highscore:
+                highscore = score
+                target_name = target
+                target_distance = distance
+                target_total_pressure = total_pressure
+        if highscore == 0:  # No valve can release pressure anymore
+            break
+        # Move to the target
+        field.position = target_name
+        field.turn += target_distance + 1  # + 1 for opening the valve
+        total_pressure_released += target_total_pressure
+        field.valve_dict[target_name].open = True
+
+    print(total_pressure_released)
 
 
 if __name__ == "__main__":
