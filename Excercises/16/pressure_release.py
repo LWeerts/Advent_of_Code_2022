@@ -1,5 +1,15 @@
 # Attempted answers: 1777, too low
+import time
 
+
+def memoize(func):
+    memo = {}
+
+    def helper(inp1, inp2):
+        if (inp1, inp2) not in memo:
+            memo[(inp1, inp2)] = func(inp1, inp2)
+        return memo[(inp1, inp2)]
+    return helper
 
 
 class Valve():
@@ -46,7 +56,8 @@ class PlayingField():
         output.sort(key=lambda valve: valve[1], reverse=True)
         return output
 
-    def find_path(self, target: str) -> int:
+    @memoize
+    def find_path(self, start: str) -> dict:
         """Finds shortest path in a simple network.
 
         Uses a dictionary to store each node and its distance.
@@ -54,30 +65,29 @@ class PlayingField():
         which are then added into the dictionary.
 
         Returns:
-            int: length of the path to the target
+            dict: distance to all other valves
         """
-        distance_dict = {self.position: 0}
-        distance = 0
-        while distance < 1000:
-            if target in distance_dict:
-                break
+        distance_dict = {start: 0}
+        shell = 0
+        while len(distance_dict) != len(self.valve_dict) or shell < 1000:
             to_be_added = {}
             for valve, dist in distance_dict.items():
-                if dist != distance:
+                if dist != shell:
                     continue
                 connections = self.valve_dict[valve].tunnels
                 for tunnel in connections:
                     if tunnel in distance_dict:
                         continue
-                    to_be_added[tunnel] = distance + 1
+                    to_be_added[tunnel] = shell + 1
 
-            distance += 1
+            shell += 1
             distance_dict.update(to_be_added)
-        return distance_dict[target]
+        return distance_dict
 
     def calc_score(self, target: str) -> tuple[int, int]:
         # Calculate what total pressure will be released from target valve
-        distance = self.find_path(target)
+        distance_dict = self.find_path(self.position)
+        distance = distance_dict[target]
         # 30 minutes -1 for opening the valve
         minutes = 29 - distance - self.turn
         if minutes <= 0:  # No time left
@@ -88,6 +98,7 @@ class PlayingField():
 
 
 def main():
+    start = time.perf_counter()
     field = PlayingField()
     # print(field.valve_dict)
     # print(field.valve_dict["AA"])
@@ -129,6 +140,8 @@ def main():
         field.valve_dict[target_name].open = True
 
     print(total_pressure_released)
+    end = time.perf_counter()
+    print(f"Time taken: {end - start}")
 
 
 if __name__ == "__main__":
