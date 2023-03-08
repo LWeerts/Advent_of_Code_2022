@@ -1,4 +1,5 @@
 # Attempted answers: 1777, too low
+#                    2192, too low
 import time
 
 
@@ -24,11 +25,15 @@ class Valve():
 
 
 class PlayingField():
-    def __init__(self) -> None:
-        self.valve_dict = self.parse_input()
+    def __init__(self, valve_dict=None, position="AA", route=[]) -> None:
+        if valve_dict is None:
+            self.valve_dict = self.parse_input()
+        else:
+            self.valve_dict = valve_dict
         self.flow_list = self.sort_flow()
         self.turn = 0
-        self.position = "AA"
+        self.position = position
+        self.route = route
 
     def parse_input(self) -> dict[str, Valve]:
         valve_dict = {}
@@ -105,16 +110,18 @@ def main():
     # print(field.flow_list)
 
     total_pressure_released = 0
+    route = []
+    high_flow_valves = [name for name, flow in field.flow_list if flow > 0]
 
     while field.turn < 30:
         # Grab 5 promising valves as next targets
-        high_flow_valves: list[str] = []
-        for name, _ in field.flow_list:
-            if len(high_flow_valves) == 5:
-                break
-            if field.valve_dict[name].open:
-                continue
-            high_flow_valves.append(name)
+        # high_flow_valves: list[str] = []
+        # for name, _ in field.flow_list:
+        #     if len(high_flow_valves) == 5:
+        #         break
+        #     if field.valve_dict[name].open:
+        #         continue
+        #     high_flow_valves.append(name)
 
         highscore = 0
         target_name = ""
@@ -123,7 +130,7 @@ def main():
         for target in high_flow_valves:
             total_pressure, distance = field.calc_score(target)
             if distance != 0:
-                score = total_pressure / (distance ** 2)
+                score = total_pressure / distance**2
             else:
                 score = total_pressure
             if score > highscore:
@@ -138,10 +145,15 @@ def main():
         field.turn += target_distance + 1  # + 1 for opening the valve
         total_pressure_released += target_total_pressure
         field.valve_dict[target_name].open = True
+        
+        high_flow_valves.remove(target_name)
+        route.append(target_name)
 
     print(total_pressure_released)
     end = time.perf_counter()
     print(f"Time taken: {end - start}")
+    print(field.flow_list)
+    print(route)
 
 
 if __name__ == "__main__":
