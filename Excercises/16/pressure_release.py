@@ -89,12 +89,15 @@ class PlayingField():
             distance_dict.update(to_be_added)
         return distance_dict
 
-    def calc_score(self, target: str) -> tuple[int, int]:
+    def calc_score(self, target: str,
+                   position: str,
+                   steps_taken: int
+                   ) -> tuple[int, int]:
         # Calculate what total pressure will be released from target valve
-        distance_dict = self.find_path(self.position)
+        distance_dict = self.find_path(position)
         distance = distance_dict[target]
         # 30 minutes -1 for opening the valve
-        minutes = 29 - distance - self.turn
+        minutes = 29 - distance - steps_taken
         if minutes <= 0:  # No time left
             return 0, 0
         flow = self.valve_dict[target].flow
@@ -103,7 +106,7 @@ class PlayingField():
 
 
 def main():
-    start = time.perf_counter()
+    start_time = time.perf_counter()
     field = PlayingField()
     # print(field.valve_dict)
     # print(field.valve_dict["AA"])
@@ -128,7 +131,11 @@ def main():
         target_distance = 0
         target_total_pressure = 0
         for target in high_flow_valves:
-            total_pressure, distance = field.calc_score(target)
+            total_pressure, distance = field.calc_score(
+                target, 
+                field.position, 
+                field.turn
+            )
             if distance != 0:
                 score = total_pressure / distance**2
             else:
@@ -150,11 +157,103 @@ def main():
         route.append(target_name)
 
     print(total_pressure_released)
-    end = time.perf_counter()
-    print(f"Time taken: {end - start}")
+    end_time = time.perf_counter()
+    print(f"Time taken: {end_time - start_time}")
     print(field.flow_list)
     print(route)
 
 
+def explore_branch(field: PlayingField, 
+                   cur_route: list[str],
+                   high_flow_valves: list[str],
+                   flow_total: int,
+                   steps_taken: int
+                   ):
+    branch_dict = {}
+    for name in high_flow_valves:
+        if name not in cur_route:
+            score, distance = field.calc_score(
+                name, cur_route[-1], steps_taken)
+            if score == 0 and distance == 0:
+                continue
+            score += flow_total
+            distance += steps_taken + 1
+
+            branch_dict[name] = explore_branch(
+                field,
+                cur_route + [name],
+                high_flow_valves,
+                score,
+                distance
+            )
+            # Make recursive
+
+    if not branch_dict:  # No further steps to take: flow and steps are final
+        branch_dict = (flow_total, steps_taken)
+    return branch_dict
+
+
+class FindMaxInDict:
+    def __init__(self, my_dict: dict) -> None:
+        self.highest_score = 0
+        self.best_route = []
+        self.sift_dict(my_dict, [])
+        print(f"high score {self.highest_score}")
+        print(f"best route {self.best_route}")
+    
+    def sift_dict(self, my_dict: dict, cur_route: list[str]):
+        for name, data in my_dict.items():
+            if type(data) == dict:
+                self.sift_dict(data, cur_route + [name])
+            else:
+                score, _ = data
+                if score > self.highest_score:
+                    self.highest_score = score
+                    self.best_route = cur_route + [name]
+
+
+    
+
+
+# def sift_dict(my_dict: dict, cur_route):
+#     highest_score = 0
+#     best_route = []
+#     for name, data in my_dict.items():
+#         if type(data) == dict:
+#             pass
+#         else:
+#             score, _ = data
+#         if score > highest_score:
+#             highest_score = score
+#             best_route = cur_route + [name]
+
+
+def main_WIP():
+    start_time = time.perf_counter()
+    field = PlayingField()
+    all_route_dict = {'AA': {}}
+    cur_route = ['AA']
+    high_flow_valves = [name for name, flow in field.flow_list if flow > 0]
+    
+    all_route_dict["AA"] = explore_branch(
+        field, cur_route, high_flow_valves, 0, 0)
+    
+    mid_time = time.perf_counter()
+    print(f"Time taken: {mid_time - start_time}")
+
+    FindMaxInDict(all_route_dict)
+    end_time = time.perf_counter()
+    print(f"Time taken: {end_time - mid_time}")
+
+    # input()
+    # print(all_route_dict)
+
+    # branch_dict = all_route_dict["AA"]
+    # for name in high_flow_valves:
+    #     if name not in cur_route:
+    #         branch_dict[name] = field.calc_score(name)
+    # print(branch_dict)
+
+
 if __name__ == "__main__":
-    main()
+    main_WIP()
